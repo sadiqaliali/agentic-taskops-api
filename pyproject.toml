@@ -1,0 +1,31 @@
+[project]
+name = "agentic-taskops-api"
+version = "1.0.0"
+description = "Production-grade backend for internal or SaaS agent backend."
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "sqlmodel",
+    "alembic",
+    "pydantic-settings",
+    "python-jose[cryptography]",
+    "passlib[bcrypt]",
+    "bcrypt==3.2.2",
+    "asyncpg",
+    "pydantic[email]",
+    "psycopg2-binary",
+    "python-multipart",
+]
+
+[project.urls]
+Homepage = "https://github.com/your-org/agentic-taskops-api"
+"Bug Tracker" = "https://github.com/your-org/agentic-taskops-api/issues"
+
+[tool.uv]
+dev-dependencies = [
+    "pytest",
+    "httpx",
+]
+
+[tool.setuptools]
+packages = ["app", "config"]
