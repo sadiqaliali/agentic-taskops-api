@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field, PostgresDsn
+from pydantic import Field, PostgresDsn, field_validator
 from typing import Optional
 
 class Settings(BaseSettings):
@@ -25,6 +25,14 @@ class Settings(BaseSettings):
     SECRET_KEY: str = Field(..., description="Secret key for signing JWT tokens.")
     ALGORITHM: str = Field(default="HS256", description="Algorithm used for JWT signing.")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30, description="Lifetime of access tokens in minutes.")
+
+    @field_validator("SECRET_KEY", "ALGORITHM")
+    @classmethod
+    def strip_quotes(cls, v: str) -> str:
+        """
+        Strips leading/trailing single and double quotes from a string.
+        """
+        return v.strip("'\"")
 
     model_config = SettingsConfigDict(
         env_file=".env",

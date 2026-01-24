@@ -1,0 +1,21 @@
+# --- Builder Stage ---
+FROM python:3.11 as builder
+RUN useradd --create-home --shell /bin/bash appuser
+WORKDIR /home/appuser
+RUN pip install uv
+COPY pyproject.toml uv.lock ./
+RUN uv venv .venv && . .venv/bin/activate && uv sync --no-dev
+
+# --- Runner Stage ---
+FROM python:3.11-slim
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+RUN useradd --create-home --shell /bin/bash appuser
+WORKDIR /home/appuser/app
+COPY --from=builder /home/appuser/.venv .venv
+COPY . .
+RUN chown -R appuser:appuser /home/appuser/app
+RUN chmod +x ./docker-entrypoint.sh
+USER appuser
+EXPOSE 8000
+ENTRYPOINT ["/home/appuser/app/docker-entrypoint.sh"]
