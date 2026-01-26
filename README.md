@@ -1,23 +1,39 @@
-# Agentic TaskOps API - v1.0.0
+# Agentic TaskOps API
 
-A production-grade, asynchronous, and secure FastAPI backend designed to serve as a robust foundation for internal or SaaS-based AI agentic applications. This project is architected for stability, scalability, and developer-friendliness from the ground up.
+A production-grade, asynchronous, and secure FastAPI backend designed to serve as a robust foundation for internal or SaaS-based AI agentic applications. 
 
 ---
 
-## Features
+## Vision & Mission
 
--   **Asynchronous Core**: Built entirely on an `async` stack (FastAPI, SQLAlchemy 2.0, `asyncpg`) for high-performance, non-blocking I/O.
--   **Secure Authentication**:
-    -   Secure user registration (`/auth/register`) with `bcrypt` password hashing.
-    -   Stateless JWT-based login (`/auth/login`) providing access tokens.
--   **Protected Task Management API**:
-    -   Full asynchronous CRUD (Create, Read, Update, Delete) operations for tasks.
-    -   Strict ownership-based authorization: Users can only access their own tasks.
--   **Streaming Agent Endpoint**:
-    -   Real-time progress updates for long-running agentic tasks via Server-Sent Events (SSE).
--   **Production-Ready Tooling**:
-    -   Uses `uv` for fast, modern dependency and environment management.
-    -   Includes Alembic for robust database schema migrations.
+In the rapidly evolving world of AI, developers need more than just a simple API. They need a stable, scalable, and secure "operating system" to deploy, manage, and monitor their AI agents. 
+
+The mission of **Agentic TaskOps API** is to be that system. This project provides the essential backend infrastructure—from asynchronous task handling to enterprise-grade security—so developers can focus on building intelligent agents, not rebuilding boilerplate infrastructure.
+
+---
+
+## Project Status & Roadmap
+
+This project is actively developed. We have a clear roadmap for new features and enhancements.
+
+### ✅ Version 1.0: Core Foundation
+
+-   **Asynchronous Core**: High-performance stack (FastAPI, SQLAlchemy 2.0).
+-   **Secure Authentication**: JWT-based login with password hashing.
+-   **Protected Task Management API**: Full async CRUD for tasks with ownership-based authorization.
+-   **Production-Ready Tooling**: `uv` for dependency management and Alembic for migrations.
+-   **Containerization**: Ready-to-use `Dockerfile`.
+
+### 🚀 Version 2.0: Production Readiness & Core Features
+
+This version focuses on building a robust, scalable, and monitorable foundation, making the API ready for production use and more advanced agentic workflows.
+
+-   [ ] **Observability & Monitoring:** Structured logging, Prometheus metrics, and distributed tracing.
+-   [ ] **Asynchronous Task Queues:** Celery/ARQ integration for true background processing.
+-   [ ] **Scheduled & Recurring Tasks:** Time-based and recurring job scheduling.
+-   [ ] **Real-Time Updates:** WebSocket integration for live task updates.
+-   [ ] **Enhanced Security:** Role-Based Access Control (RBAC) and dedicated API Key management.
+-   [ ] **High Availability:** Advanced health checks and graceful shutdown procedures.
 
 ---
 
@@ -37,104 +53,43 @@ A production-grade, asynchronous, and secure FastAPI backend designed to serve a
 ### Prerequisites
 
 -   Python 3.11+
--   PostgreSQL 13+
+-   Docker & Docker Compose
 -   `uv` (can be installed with `pip install uv`)
 
 ### 1. Set Up The Environment
 
-First, clone the repository and set up your local `.env` file.
+Clone the repository and create a `.env` file from the example.
 
 ```shell
-# Copy the example environment file
 cp .env.example .env
 ```
+**Edit the `.env` file** with your database credentials and a unique `SECRET_KEY`.
 
-Now, **edit the `.env` file** with your PostgreSQL database URL and a new, unique `SECRET_KEY`.
+### 2. Install & Run (Docker Recommended)
 
-### 2. Install Dependencies
-
-Create the virtual environment and install all dependencies using `uv`.
+For a seamless setup, we recommend using Docker. 
 
 ```shell
-# Create the virtual environment
-uv venv
+# Build and run the API and a PostgreSQL database
+docker-compose up --build
+```
+The API will be available at `http://127.0.0.1:8000`. Migrations are applied automatically on startup.
 
-# Activate the virtual environment
-# On Windows (PowerShell):
-.venv\Scripts\Activate.ps1
-# On macOS/Linux:
-# source .venv/bin/activate
+### 3. Local Development (Without Docker)
 
+If you prefer to run locally:
+```shell
 # Install dependencies
 uv sync
-```
 
-### 3. Run Database Migrations
-
-Apply all database migrations to set up your database schema correctly.
-
-```shell
+# Run database migrations
 alembic upgrade head
-```
 
-### 4. Run the Application
-
-Start the development server using `uvicorn`.
-
-```shell
+# Run the development server
 uv run uvicorn app.main:app --reload
 ```
-
-The API will now be running at `http://127.0.0.1:8000`.
-
 ---
 
 ## API Endpoints
 
-The interactive API documentation (Swagger UI) is available at `http://127.0.0.1:8000/docs`.
-
-| Method | Path                | Description                               | Auth Required |
-|--------|---------------------|-------------------------------------------|:-------------:|
-| `GET`  | `/`                 | Health check / Welcome message            |       -       |
-| `POST` | `/auth/register`    | Register a new user                       |       -       |
-| `POST` | `/auth/login`       | Log in to get a JWT access token          |       -       |
-| `POST` | `/tasks/`           | Create a new task                         |      ✅       |
-| `GET`  | `/tasks/`           | Get all tasks for the current user        |      ✅       |
-| `GET`  | `/tasks/{task_id}`  | Get a specific task by its ID             |      ✅       |
-| `PATCH`| `/tasks/{task_id}`  | Update a specific task                    |      ✅       |
-| `DELETE`| `/tasks/{task_id}`| Delete a specific task                    |      ✅       |
-| `POST` | `/agent/run`        | Run an agent task and stream the response |      ✅       |
-
----
-
-## Running with Docker
-
-This project includes a `Dockerfile` for easy containerization.
-
-### 1. Build the Docker Image
-
-From the root of the project, run the build command:
-
-```shell
-docker build -t agentic-taskops-api .
-```
-
-### 2. Run the Docker Container
-
-Run the container, making sure to expose port 8000 and pass your `.env` file.
-
-```shell
-docker run --env-file .env -p 8000:8000 agentic-taskops-api
-```
-
-The container will start, run the migrations, and launch the application, accessible at `http://127.0.0.1:8000`.
-
----
-
-## Future Roadmap
-
--   **CI/CD Integration**: Add GitHub Actions to automate testing, linting, and image publishing to Docker Hub.
--   **Docker Compose**: Add a `docker-compose.yml` for a one-command setup of the API and PostgreSQL database.
--   **Background Task Processing**: Integrate Celery or ARQ for handling truly long-running, non-blocking agent tasks.
--   **Expanded Test Suite**: Increase unit and integration test coverage.
--   **Role-Based Access Control (RBAC)**: Introduce more granular user permissions.
+The interactive API documentation (Swagger UI) is available at `http://127.0.0.1:8000/docs` once the application is running.
